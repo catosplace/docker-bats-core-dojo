@@ -1,0 +1,46 @@
+FROM ubuntu:18.04
+
+ENV DOJO_VERSION=0.3.2
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends\
+  sudo git \
+  apt-transport-https ca-certificates curl gnupg-agent software-properties-common &&\
+  git clone --depth 1 -b ${DOJO_VERSION} https://github.com/ai-traders/dojo.git /tmp/dojo_git &&\
+  /tmp/dojo_git/image_scripts/src/install.sh && \
+  rm -r /tmp/dojo_git && \
+  echo 'dojo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+ENV BATS_CORE_VERSION=8789f910812afbf6b87dd371ee5ae30592f1423f
+RUN mkdir -p /opt/bats && cd /opt/bats &&\
+  git init &&\
+  git remote add origin https://github.com/bats-core/bats-core.git &&\
+  git fetch --depth 1 origin ${BATS_CORE_VERSION} &&\
+  git checkout FETCH_HEAD &&\
+  /opt/bats/install.sh /usr/local
+
+# Install Docker
+# To support docker in docker on any driver - clean up now and
+# declare volume to bypass any storage drivers
+RUN /bin/bash -c "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -" &&\
+  echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" > /etc/apt/sources.list.d/docker.list &&\
+  apt-get update &&\
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends\
+  docker-ce &&\
+  rm -Rf /var/lib/docker/* &&\
+  rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* /var/tmp/*
+VOLUME /var/lib/docker
+
+ADD https://github.com/just-containers/s6-overlay/releases/download/v1.21.8.0/s6-overlay-amd64.tar.gz /tmp/
+RUN gunzip -c /tmp/s6-overlay-amd64.tar.gz | tar -xf - -C /
+
+ADD entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+
+COPY ./services.d /etc/services.d
+
+# pretty bash prompt
+COPY bashrc /home/dojo/.bashrc
+COPY profile /home/dojo/.profile
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
+CMD ["/bin/bash"]
