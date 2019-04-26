@@ -80,7 +80,7 @@ case "${command}" in
       echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> ./Dojofile.sut
       echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> ./Dojofile.sut
       echo "DOJO_DOCKER_OPTIONS=--privileged" >> ./Dojofile.sut
-      dojo -c ./Dojofile.sut "bats -t --pretty ."
+      dojo -c ./Dojofile.sut "bats -t ."
       ;;
   example)
       check_flavor $2
