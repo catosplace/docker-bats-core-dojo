@@ -5,10 +5,16 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repos
   apk add --no-cache bash shadow sudo git && \
   git clone --depth 1 -b ${DOJO_VERSION} https://github.com/ai-traders/dojo.git /tmp/dojo_git &&\
   /tmp/dojo_git/image_scripts/src/install.sh && \
+  addgroup dojo root && \
   rm -r /tmp/dojo_git && \
   echo 'dojo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-RUN git clone --depth 1 https://github.com/bats-core/bats-core.git /opt/bats &&\
+ENV BATS_CORE_VERSION=8789f910812afbf6b87dd371ee5ae30592f1423f
+RUN mkdir -p /opt/bats && cd /opt/bats &&\
+  git init &&\
+  git remote add origin https://github.com/bats-core/bats-core.git &&\
+  git fetch --depth 1 origin ${BATS_CORE_VERSION} &&\
+  git checkout FETCH_HEAD &&\
   /opt/bats/install.sh /usr/local
 
 ADD https://github.com/just-containers/s6-overlay/releases/download/v1.21.8.0/s6-overlay-amd64.tar.gz /tmp/
@@ -18,6 +24,10 @@ ADD entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
 COPY ./services.d /etc/services.d
+
+# pretty bash prompt
+COPY bashrc /home/dojo/.bashrc
+COPY profile /home/dojo/.profile
 
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 CMD ["/bin/bash"]

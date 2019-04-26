@@ -1,1 +1,4 @@
 /ops/
+/image/*imagerc*
+/Dojofile.example
+/Dojofile.sut
