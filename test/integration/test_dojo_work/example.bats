@@ -13,3 +13,7 @@
   [ "$status" -eq 0 ]
   [[ "$output" =~ 'Hello from Docker!' ]]
 }
+@test "docker-compose CLI works" {
+  run docker-compose --version
+  [ "$status" -eq 0 ]
+}
