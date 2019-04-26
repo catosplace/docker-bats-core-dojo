@@ -2,7 +2,7 @@ FROM docker:18.09-dind
 
 ENV DOJO_VERSION=0.3.2
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
-  apk add --no-cache bash shadow sudo git && \
+  apk add --no-cache bash shadow sudo git ncurses && \
   git clone --depth 1 -b ${DOJO_VERSION} https://github.com/ai-traders/dojo.git /tmp/dojo_git &&\
   /tmp/dojo_git/image_scripts/src/install.sh && \
   addgroup dojo root && \

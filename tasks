@@ -72,6 +72,7 @@ case "${command}" in
       ;;
   itest)
       check_flavor $2
+      imagerc_filename="$2.imagerc"
       mkdir -p test/integration/test_dojo_work test/integration/identities/full
       docker_ops::ensure_pulled_image "${image_dir}" "${imagerc_filename}"
       echo "Testing image: ${KUDU_DOCKER_IMAGE_URL}"
@@ -79,7 +80,7 @@ case "${command}" in
       echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> ./Dojofile.sut
       echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> ./Dojofile.sut
       echo "DOJO_DOCKER_OPTIONS=--privileged" >> ./Dojofile.sut
-      dojo -c ./Dojofile.sut "bats -t ."
+      dojo -c ./Dojofile.sut "bats -t --pretty ."
       ;;
   example)
       check_flavor $2
