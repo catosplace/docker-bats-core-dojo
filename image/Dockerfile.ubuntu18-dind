@@ -30,6 +30,8 @@ RUN /bin/bash -c "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo
   rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* /var/tmp/*
 VOLUME /var/lib/docker
 
+RUN usermod -aG docker dojo
+
 ENV DOCKER_COMPOSE_VERSION="1.23.2"
 RUN wget --tries=3 --retry-connrefused --wait=3 --random-wait --quiet --show-progress --progress=bar:force \
   -O /usr/local/bin/docker-compose \
