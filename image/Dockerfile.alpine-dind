@@ -47,6 +47,7 @@ ADD entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
 COPY ./services.d /etc/services.d
+COPY ./etc_dojo.d/scripts/* /etc/dojo.d/scripts/
 
 # pretty bash prompt
 COPY bashrc /home/dojo/.bashrc
